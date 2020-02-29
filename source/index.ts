@@ -4,4 +4,5 @@
  */
 
 import { ObservableInput } from "rxjs";
-const unused: ObservableInput<unknown> = [];
+
+export const unused: ObservableInput<unknown> = [];

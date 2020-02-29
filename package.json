@@ -10,7 +10,7 @@
     "@cartant/tslint-config-etc": "^2.0.0",
     "@cartant/tslint-config-rxjs": "^2.0.0",
     "@types/chai": "^4.0.0",
-    "@types/mocha": "^5.0.0",
+    "@types/mocha": "^7.0.0",
     "@types/node": "^13.0.0",
     "chai": "^4.0.0",
     "cpy-cli": "^3.0.0",
@@ -21,7 +21,7 @@
     "karma-spec-reporter": "^0.0.32",
     "karma-webpack": "^4.0.2",
     "lint-staged": "^9.2.4",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^1.0.3",
     "mocha": "^7.0.0",
     "prettier": "^1.17.0",
     "puppeteer": "^2.0.0",
@@ -30,14 +30,13 @@
     "rxjs-tslint-rules": "^4.0.0",
     "ts-loader": "^6.0.0",
     "ts-node": "^8.0.0",
-    "tslint": "^5.1.0",
+    "tslint": "^6.0.0",
     "tslint-etc": "^1.2.0",
-    "typescript": "~3.7.4",
+    "typescript": "~3.8.3",
     "webpack": "^4.0.0",
     "webpack-cli": "^3.0.0",
     "webpack-rxjs-externals": "^2.0.0"
   },
-  "es2015": "./dist/esm2015/index.js",
   "homepage": "https://github.com/cartant/rxjs-strategies",
   "husky": {
     "hooks": {
@@ -56,14 +55,14 @@
       "git add"
     ]
   },
-  "main": "./dist/index.js",
-  "module": "./dist/esm5/index.js",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
   "name": "rxjs-strategies",
   "optionalDependencies": {},
   "peerDependencies": {
     "rxjs": "^6.0.0"
   },
-  "private": true,
+  "private": false,
   "publishConfig": {
     "tag": "latest"
   },
@@ -72,15 +71,17 @@
     "url": "https://github.com/cartant/rxjs-strategies.git"
   },
   "scripts": {
-    "dist": "yarn run dist:build && yarn run dist:copy",
-    "dist:build": "yarn run dist:clean && yarn run dist:build:cjs && yarn run dist:build:esm2015 && yarn run dist:build:esm5 && yarn run dist:build:bundle",
+    "dist": "yarn run dist:clean && yarn run dist:build && yarn run dist:copy",
+    "dist:build": "yarn run dist:build:cjs && yarn run dist:build:esm && yarn run dist:build:bundle",
     "dist:build:bundle": "webpack --config webpack.config.js && webpack --config webpack.config.js --env.production",
     "dist:build:cjs": "tsc -p tsconfig-dist-cjs.json",
-    "dist:build:esm2015": "tsc -p tsconfig-dist-esm2015.json",
-    "dist:build:esm5": "tsc -p tsconfig-dist-esm5.json",
+    "dist:build:esm": "tsc -p tsconfig-dist-esm.json",
     "dist:clean": "rimraf dist && rimraf bundles/rxjs-strategies.* && mkdirp bundles",
-    "dist:copy": "node scripts/pack.js && cpy bundles/rxjs-strategies.* dist/bundles/ && cpy CHANGELOG.md LICENSE README.md dist/",
+    "dist:copy": "cpy bundles/rxjs-strategies.* dist/bundles/",
     "lint": "tslint --project tsconfig.json source/**/*.ts",
+    "prepublishOnly": "yarn run test && yarn run dist",
+    "prettier": "prettier --write \"./source/**/*.{js,json,ts}\"",
+    "prettier:ci": "prettier --check \"./source/**/*.{js,json,ts}\"",
     "test": "yarn run lint && yarn run test:build && yarn run test:karma && yarn run test:mocha",
     "test:build": "yarn run test:clean && tsc -p tsconfig.json",
     "test:clean": "rimraf build",
@@ -88,7 +89,7 @@
     "test:mocha": "mocha build/**/*-spec.js",
     "test:watch": "yarn run lint && yarn run test:build && karma start"
   },
-  "types": "./dist/index.d.ts",
-  "unpkg": "./bundles/rxjs-strategies.min.umd.js",
+  "types": "./dist/esm/index.d.ts",
+  "unpkg": "./dist/bundles/rxjs-strategies.min.umd.js",
   "version": "0.0.1-alpha.1"
 }
