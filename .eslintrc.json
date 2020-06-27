@@ -1,0 +1,24 @@
+{
+  "extends": [
+    "@cartant/eslint-config",
+    "@cartant/eslint-config-etc",
+    "@cartant/eslint-config-rxjs"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "comments": true,
+    "ecmaVersion": 2019,
+    "project": "tsconfig.json",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "etc",
+    "import",
+    "rxjs"
+  ],
+  "root": true,
+  "rules": {
+    "etc/deprecation": ["off"]
+  }
+}
