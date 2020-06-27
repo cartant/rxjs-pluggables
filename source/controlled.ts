@@ -3,4 +3,8 @@
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-strategies
  */
 
-export * from "./controlled";
+import { Observable } from "rxjs";
+
+export function controlled<T>(): Observable<T> {
+  throw new Error("Not implemented.");
+}

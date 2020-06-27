@@ -3,4 +3,8 @@
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-strategies
  */
 
-export * from "./controlled";
+import { controlled } from "./controlled";
+
+describe("controlled", () => {
+  it.skip("should be tested", () => {});
+});
