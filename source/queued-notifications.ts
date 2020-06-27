@@ -7,7 +7,6 @@
 import {
   ConnectableObservable,
   Observable,
-  Observer,
   Subject,
   Subscription,
   zip,
@@ -15,13 +14,19 @@ import {
 
 import { first, map, publish } from "rxjs/operators";
 
-export class NotificationQueue extends Observable<number> {
+export class QueuedNotifications {
   private _count = 0;
   private _indices: Subject<number>;
   private _notifications: ConnectableObservable<number>;
+  private _queue: Observable<number>;
 
   constructor(notifier: Observable<any>) {
-    super((observer: Observer<number>) => {
+    this._indices = new Subject<number>();
+    this._notifications = zip(notifier, this._indices).pipe(
+      map(([, index]) => index),
+      publish()
+    ) as ConnectableObservable<number>;
+    this._queue = new Observable<number>((observer) => {
       const index = this._count++;
       const subscription = this._notifications
         .pipe(first((value) => value === index))
@@ -29,15 +34,13 @@ export class NotificationQueue extends Observable<number> {
       this._indices.next(index);
       return subscription;
     });
-
-    this._indices = new Subject<number>();
-    this._notifications = zip(notifier, this._indices).pipe(
-      map(([, index]) => index),
-      publish()
-    ) as ConnectableObservable<number>;
   }
 
   connect(): Subscription {
     return this._notifications.connect();
+  }
+
+  get queue(): Observable<number> {
+    return this._queue;
   }
 }

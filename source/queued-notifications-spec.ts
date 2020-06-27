@@ -7,9 +7,9 @@
 import { AsyncSubject } from "rxjs";
 import { marbles } from "rxjs-marbles";
 import { concatMap } from "rxjs/operators";
-import { NotificationQueue } from "./notification-queue";
+import { QueuedNotifications } from "./queued-notifications";
 
-describe("NotificationQueue", () => {
+describe("QueuedNotifications", () => {
   it(
     "should emit nothing without a notification",
     marbles((m) => {
@@ -17,13 +17,13 @@ describe("NotificationQueue", () => {
       const queuings = m.cold(" q-");
       const expected = m.cold(" --");
 
-      const queue = new NotificationQueue(notifier);
-      queue.connect();
+      const notifications = new QueuedNotifications(notifier);
+      notifications.connect();
 
       const result = queuings.pipe(
         concatMap(() => {
           const subject = new AsyncSubject<string>();
-          queue.subscribe(
+          notifications.queue.subscribe(
             (index) => subject.error(new Error("Unexpected index.")),
             (error) => subject.error(error),
             () => subject.error(new Error("Unexpected completion."))
@@ -43,13 +43,13 @@ describe("NotificationQueue", () => {
       const queuings = m.cold(" q-");
       const expected = m.cold(" -0");
 
-      const queue = new NotificationQueue(notifier);
-      queue.connect();
+      const notifications = new QueuedNotifications(notifier);
+      notifications.connect();
 
       const result = queuings.pipe(
         concatMap(() => {
           const subject = new AsyncSubject<string>();
-          queue.subscribe(
+          notifications.queue.subscribe(
             (index) => subject.next(index.toString()),
             (error) => subject.error(error),
             () => subject.complete()
@@ -69,13 +69,13 @@ describe("NotificationQueue", () => {
       const queuings = m.cold(" (qq)----");
       const expected = m.cold(" -----0-1");
 
-      const queue = new NotificationQueue(notifier);
-      queue.connect();
+      const notifications = new QueuedNotifications(notifier);
+      notifications.connect();
 
       const result = queuings.pipe(
         concatMap(() => {
           const subject = new AsyncSubject<string>();
-          queue.subscribe(
+          notifications.queue.subscribe(
             (index) => subject.next(index.toString()),
             (error) => subject.error(error),
             () => subject.complete()
@@ -95,13 +95,13 @@ describe("NotificationQueue", () => {
       const queuings = m.cold(" -----q-q");
       const expected = m.cold(" -----0-1");
 
-      const queue = new NotificationQueue(notifier);
-      queue.connect();
+      const notifications = new QueuedNotifications(notifier);
+      notifications.connect();
 
       const result = queuings.pipe(
         concatMap(() => {
           const subject = new AsyncSubject<string>();
-          queue.subscribe(
+          notifications.queue.subscribe(
             (index) => subject.next(index.toString()),
             (error) => subject.error(error),
             () => subject.complete()

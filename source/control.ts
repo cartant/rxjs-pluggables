@@ -16,7 +16,7 @@ import {
 } from "rxjs";
 
 import { expand, ignoreElements, mergeMap, tap } from "rxjs/operators";
-import { NotificationQueue } from "./notification-queue";
+import { QueuedNotifications } from "./queued-notifications";
 
 export type ControlElement<T, M> = {
   markers: ObservableInput<M>;
@@ -56,15 +56,15 @@ export function control<T, M, R>({
   notifier?: Observable<any>;
 }): Observable<T | R> {
   return new Observable<T | R>((observer) => {
-    let queue: NotificationQueue;
+    let notifications: QueuedNotifications;
     let queueOperator: MonoTypeOperatorFunction<M | undefined>;
 
     if (notifier) {
-      queue = new NotificationQueue(notifier);
+      notifications = new QueuedNotifications(notifier);
       queueOperator = identity;
     } else {
       const subject = new Subject<any>();
-      queue = new NotificationQueue(subject);
+      notifications = new QueuedNotifications(subject);
       queueOperator = (markers) => {
         subject.next();
         return markers;
@@ -73,13 +73,13 @@ export function control<T, M, R>({
 
     const destination = new Subject<T | R>();
     const subscription = destination.subscribe(observer);
-    subscription.add(queue.connect());
+    subscription.add(notifications.connect());
     subscription.add(
       of(undefined)
         .pipe(
           expand(
             (marker: M | undefined) =>
-              queue.pipe(
+              notifications.queue.pipe(
                 mergeMap((index) =>
                   factory(marker, index).pipe(
                     mergeMap(({ markers, values }) =>
