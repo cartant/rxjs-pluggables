@@ -4,7 +4,7 @@
  */
 
 import { expect } from "chai";
-import { asapScheduler, concat, NEVER, of, Subject } from "rxjs";
+import { asapScheduler, concat, NEVER, of } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { refCountOn } from "./ref-count-on";
 import { shareWith } from "./share-with";
@@ -16,9 +16,7 @@ describe("refCountOn", () => {
     const source = concat(of(1, 2, 3), NEVER).pipe(
       finalize(() => (unsubscribed = true))
     );
-    const shared = source.pipe(
-      shareWith(() => new Subject<number>(), refCountOn(asapScheduler))
-    );
+    const shared = source.pipe(shareWith(refCountOn(asapScheduler)));
     const subscription = shared.subscribe((value) => values.push(value));
     expect(values).to.deep.equal([]);
     asapScheduler.schedule(() => {

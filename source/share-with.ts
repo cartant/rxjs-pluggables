@@ -5,29 +5,29 @@
 /* eslint rxjs/no-connectable: "off" */
 
 import { OperatorFunction, Subject } from "rxjs";
-import { multicast, refCount as defaultRefCount, tap } from "rxjs/operators";
+import { multicast, tap } from "rxjs/operators";
 
 export function shareWith<T>(
-  subject: Subject<T>,
-  refCount?: OperatorFunction<T, T>
+  refCount: OperatorFunction<T, T>,
+  subject?: Subject<T>
 ): OperatorFunction<T, T>;
 
 export function shareWith<T>(
-  subjectFactory: (
+  refCount: OperatorFunction<T, T>,
+  subjectFactory?: (
     kind: "C" | "E" | undefined,
     previousSubject: Subject<T> | undefined
-  ) => Subject<T>,
-  refCount?: OperatorFunction<T, T>
+  ) => Subject<T>
 ): OperatorFunction<T, T>;
 
 export function shareWith<T>(
+  refCount: OperatorFunction<T, T>,
   arg:
     | Subject<T>
     | ((
         kind: "C" | "E" | undefined,
         previousSubject: Subject<T> | undefined
-      ) => Subject<T>),
-  refCount = defaultRefCount<T>()
+      ) => Subject<T>) = new Subject<T>()
 ): OperatorFunction<T, T> {
   const factory = typeof arg === "function" ? arg : () => arg;
   let kind: "C" | "E" | undefined = undefined;

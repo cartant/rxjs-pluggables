@@ -6,6 +6,7 @@
 import { expect } from "chai";
 import { ReplaySubject, Subject } from "rxjs";
 import { marbles } from "rxjs-marbles";
+import { refCount } from "rxjs/operators";
 import { shareWith } from "./share-with";
 
 describe("shareWith", () => {
@@ -29,7 +30,7 @@ describe("shareWith", () => {
       const time3 = m.time("  ------|");
 
       const shared = source.pipe(
-        shareWith((k, s) => {
+        shareWith(refCount(), (k, s) => {
           kind = k;
           subject = s;
           return new Subject<string>();
@@ -74,7 +75,7 @@ describe("shareWith", () => {
       const time3 = m.time("  ------|");
 
       const shared = source.pipe(
-        shareWith((k, s) => {
+        shareWith(refCount(), (k, s) => {
           kind = k;
           subject = s;
           return new Subject<string>();
@@ -117,7 +118,7 @@ describe("shareWith", () => {
       const time3 = m.time("  ------|");
 
       const shared = source.pipe(
-        shareWith((k, s) => {
+        shareWith(refCount(), (k, s) => {
           kind = k;
           subject = s;
           return new Subject<string>();
@@ -155,7 +156,7 @@ describe("shareWith", () => {
       const expected2 = "     ---(b|)-";
 
       const shared = source.pipe(
-        shareWith((kind, subject) =>
+        shareWith(refCount(), (kind, subject) =>
           kind === "C" && subject ? subject : new ReplaySubject<string>(1)
         )
       );

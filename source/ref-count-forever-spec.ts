@@ -4,7 +4,7 @@
  */
 
 import { expect } from "chai";
-import { concat, of, NEVER, Subject } from "rxjs";
+import { concat, of, NEVER } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { refCountForever } from "./ref-count-forever";
 import { shareWith } from "./share-with";
@@ -16,9 +16,7 @@ describe("refCountForever", () => {
     const source = concat(of(1, 2, 3), NEVER).pipe(
       finalize(() => (unsubscribed = true))
     );
-    const shared = source.pipe(
-      shareWith(() => new Subject<number>(), refCountForever())
-    );
+    const shared = source.pipe(shareWith(refCountForever()));
     const subscription = shared.subscribe((value) => values.push(value));
     expect(values).to.deep.equal([1, 2, 3]);
     subscription.unsubscribe();
