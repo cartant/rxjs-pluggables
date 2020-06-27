@@ -18,40 +18,40 @@ import {
 import { expand, ignoreElements, mergeMap, tap } from "rxjs/operators";
 import { NotificationQueue } from "./notification-queue";
 
-export type ControlledElement<T, M> = {
+export type ControlElement<T, M> = {
   markers: ObservableInput<M>;
   values: ObservableInput<T>;
 };
-export type ControlledFactory<T, M> = (
+export type ControlFactory<T, M> = (
   marker: M | undefined,
   index: number
-) => Observable<ControlledElement<T, M>>;
+) => Observable<ControlElement<T, M>>;
 
-export function controlled<T, M>(options: {
+export function control<T, M>(options: {
   concurrency?: number;
-  factory: ControlledFactory<T, M>;
+  factory: ControlFactory<T, M>;
   notifier: Observable<any>;
 }): Observable<T>;
 
-export function controlled<T, M, R>(options: {
+export function control<T, M, R>(options: {
   concurrency?: number;
-  factory: ControlledFactory<T, M>;
+  factory: ControlFactory<T, M>;
   operator: OperatorFunction<T, R>;
 }): Observable<R>;
 
-export function controlled<T, M>(options: {
+export function control<T, M>(options: {
   concurrency?: number;
-  factory: ControlledFactory<T, M>;
+  factory: ControlFactory<T, M>;
 }): Observable<T>;
 
-export function controlled<T, M, R>({
+export function control<T, M, R>({
   concurrency = 1,
   factory,
   operator = identity,
   notifier,
 }: {
   concurrency?: number;
-  factory: ControlledFactory<T, M>;
+  factory: ControlFactory<T, M>;
   operator?: OperatorFunction<T, T | R>;
   notifier?: Observable<any>;
 }): Observable<T | R> {

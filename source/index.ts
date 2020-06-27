@@ -3,4 +3,4 @@
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-strategies
  */
 
-export * from "./controlled";
+export * from "./control";
