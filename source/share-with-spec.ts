@@ -17,24 +17,27 @@ describe("shareWith", () => {
 
       const source = m.cold(" a-|");
       //                      a-#
-      const sub1 = "          ^------";
+      const sourceSub1 = "    ^-!----";
+      const sharedSub1 = "    ^------";
       const time1 = m.time("  -|-----");
-      const out1 = "          a-|----";
+      const expected1 = "     a-|----";
       //                         a-#
-      const sub2 = "          ---^---";
+      const sourceSub2 = "    ---^-!-";
+      const sharedSub2 = "    ---^---";
       const time2 = m.time("  ----|--");
-      const out2 = "          ---a-|-";
+      const expected2 = "     ---a-|-";
       const time3 = m.time("  ------|");
 
-      const result = source.pipe(
+      const shared = source.pipe(
         shareWith((k, s) => {
           kind = k;
           subject = s;
           return new Subject<string>();
         })
       );
-      m.expect(result, sub1).toBeObservable(out1);
-      m.expect(result, sub2).toBeObservable(out2);
+      m.expect(source).toHaveSubscriptions([sourceSub1, sourceSub2]);
+      m.expect(shared, sharedSub1).toBeObservable(expected1);
+      m.expect(shared, sharedSub2).toBeObservable(expected2);
 
       m.scheduler.schedule(() => {
         expect(kind).to.equal(undefined);
@@ -59,24 +62,27 @@ describe("shareWith", () => {
 
       const source = m.cold(" a-#");
       //                      a-#
-      const sub1 = "          ^------";
+      const sourceSub1 = "    ^-!----";
+      const sharedSub1 = "    ^------";
       const time1 = m.time("  -|-----");
-      const out1 = "          a-#----";
+      const expected1 = "     a-#----";
       //                         a-#
-      const sub2 = "          ---^---";
+      const sourceSub2 = "    ---^-!-";
+      const sharedSub2 = "    ---^---";
       const time2 = m.time("  ----|--");
-      const out2 = "          ---a-#-";
+      const expected2 = "     ---a-#-";
       const time3 = m.time("  ------|");
 
-      const result = source.pipe(
+      const shared = source.pipe(
         shareWith((k, s) => {
           kind = k;
           subject = s;
           return new Subject<string>();
         })
       );
-      m.expect(result, sub1).toBeObservable(out1);
-      m.expect(result, sub2).toBeObservable(out2);
+      m.expect(source).toHaveSubscriptions([sourceSub1, sourceSub2]);
+      m.expect(shared, sharedSub1).toBeObservable(expected1);
+      m.expect(shared, sharedSub2).toBeObservable(expected2);
 
       m.scheduler.schedule(() => {
         expect(kind).to.equal(undefined);
@@ -101,24 +107,25 @@ describe("shareWith", () => {
 
       const source = m.cold(" a--");
       //                      a--
-      const sub1 = "          ^-!----";
+      const sharedSub1 = "    ^-!----";
       const time1 = m.time("  -|-----");
-      const out1 = "          a------";
+      const expected1 = "     a------";
       //                         a--
-      const sub2 = "          ---^-!-";
+      const sharedSub2 = "    ---^-!-";
       const time2 = m.time("  ----|--");
-      const out2 = "          ---a---";
+      const expected2 = "     ---a---";
       const time3 = m.time("  ------|");
 
-      const result = source.pipe(
+      const shared = source.pipe(
         shareWith((k, s) => {
           kind = k;
           subject = s;
           return new Subject<string>();
         })
       );
-      m.expect(result, sub1).toBeObservable(out1);
-      m.expect(result, sub2).toBeObservable(out2);
+      m.expect(source).toHaveSubscriptions([sharedSub1, sharedSub2]);
+      m.expect(shared, sharedSub1).toBeObservable(expected1);
+      m.expect(shared, sharedSub2).toBeObservable(expected2);
 
       m.scheduler.schedule(() => {
         expect(kind).to.equal(undefined);
@@ -139,22 +146,22 @@ describe("shareWith", () => {
     "should be able to reuse the subject",
     marbles((m) => {
       const source = m.cold(" ab|");
-      const sub0 = "          ^-!";
       //                      ab|
-      const sub1 = "          ^-------";
-      const out1 = "          ab|-----";
+      const sourceSub1 = "    ^-!";
+      const sharedSub1 = "    ^-------";
+      const expected1 = "     ab|-----";
       //                         ab|
-      const sub2 = "          ---^----";
-      const out2 = "          ---(b|)-";
+      const sharedSub2 = "    ---^----";
+      const expected2 = "     ---(b|)-";
 
-      const result = source.pipe(
+      const shared = source.pipe(
         shareWith((kind, subject) =>
           kind === "C" && subject ? subject : new ReplaySubject<string>(1)
         )
       );
-      m.expect(result, sub1).toBeObservable(out1);
-      m.expect(result, sub2).toBeObservable(out2);
-      m.expect(source).toHaveSubscriptions([sub0]);
+      m.expect(source).toHaveSubscriptions([sourceSub1]);
+      m.expect(shared, sharedSub1).toBeObservable(expected1);
+      m.expect(shared, sharedSub2).toBeObservable(expected2);
     })
   );
 });
