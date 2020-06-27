@@ -4,3 +4,4 @@
  */
 
 export * from "./control";
+export * from "./share-with";
