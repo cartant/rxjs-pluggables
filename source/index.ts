@@ -4,4 +4,7 @@
  */
 
 export * from "./control";
+export * from "./ref-count-delay";
+export * from "./ref-count-forever";
+export * from "./ref-count-on";
 export * from "./share-with";

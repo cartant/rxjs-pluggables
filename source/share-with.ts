@@ -4,21 +4,12 @@
  */
 /* eslint rxjs/no-connectable: "off" */
 
-import {
-  ConnectableObservable,
-  Observable,
-  OperatorFunction,
-  Subject,
-} from "rxjs";
+import { OperatorFunction, Subject } from "rxjs";
 import { multicast, refCount as defaultRefCount, tap } from "rxjs/operators";
-
-export type RefCountFunction<T> = (
-  connectableObservable: ConnectableObservable<T>
-) => Observable<T>;
 
 export function shareWith<T>(
   subject: Subject<T>,
-  refCount?: RefCountFunction<T>
+  refCount?: OperatorFunction<T, T>
 ): OperatorFunction<T, T>;
 
 export function shareWith<T>(
@@ -26,7 +17,7 @@ export function shareWith<T>(
     kind: "C" | "E" | undefined,
     previousSubject: Subject<T> | undefined
   ) => Subject<T>,
-  refCount?: RefCountFunction<T>
+  refCount?: OperatorFunction<T, T>
 ): OperatorFunction<T, T>;
 
 export function shareWith<T>(
@@ -36,7 +27,7 @@ export function shareWith<T>(
         kind: "C" | "E" | undefined,
         previousSubject: Subject<T> | undefined
       ) => Subject<T>),
-  refCount = defaultRefCount<T>() as RefCountFunction<T>
+  refCount = defaultRefCount<T>()
 ): OperatorFunction<T, T> {
   const factory = typeof arg === "function" ? arg : () => arg;
   let kind: "C" | "E" | undefined = undefined;

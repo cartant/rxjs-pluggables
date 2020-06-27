@@ -100,8 +100,12 @@ export function control<T, M, R>({
           )
         )
         .subscribe({
-          complete: () => destination.complete(),
-          error: (error) => destination.error(error),
+          complete() {
+            destination.complete();
+          },
+          error(error) {
+            destination.error(error);
+          },
         })
     );
     return subscription;
