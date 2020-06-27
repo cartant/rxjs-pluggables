@@ -2,7 +2,7 @@
  * @license Use of this source code is governed by an MIT-style license that
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-strategies
  */
-/* eslint rxjs/no-connectable: "off", rxjs/no-subclass: "off" */
+/* eslint rxjs/no-connectable: "off" */
 
 import {
   ConnectableObservable,
