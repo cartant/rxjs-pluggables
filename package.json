@@ -33,6 +33,7 @@
     "puppeteer": "^4.0.0",
     "rimraf": "^3.0.0",
     "rxjs": "^6.0.0",
+    "rxjs-marbles": "^6.0.1",
     "ts-loader": "^7.0.0",
     "ts-node": "^8.0.0",
     "typescript": "~3.9.3",
