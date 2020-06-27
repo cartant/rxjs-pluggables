@@ -48,7 +48,10 @@
   ],
   "license": "MIT",
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "prettier --write"
+    "*.{js,ts}": [
+      "eslint",
+      "prettier --write"
+    ]
   },
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -66,18 +69,18 @@
     "url": "https://github.com/cartant/rxjs-strategies.git"
   },
   "scripts": {
-    "dist": "yarn run dist:clean && yarn run dist:build && yarn run dist:copy",
+    "dist": "yarn run lint && yarn run dist:clean && yarn run dist:build && yarn run dist:copy",
     "dist:build": "yarn run dist:build:cjs && yarn run dist:build:esm && yarn run dist:build:bundle",
     "dist:build:bundle": "webpack --config webpack.config.js && webpack --config webpack.config.js --env.production",
     "dist:build:cjs": "tsc -p tsconfig-dist-cjs.json",
     "dist:build:esm": "tsc -p tsconfig-dist-esm.json",
     "dist:clean": "rimraf dist && rimraf bundles/rxjs-strategies.* && mkdirp bundles",
     "dist:copy": "cpy bundles/rxjs-strategies.* dist/bundles/",
-    "lint": "eslint \"./source/**/*.{ts,tsx}\"",
+    "lint": "eslint \"./source/**/*.{js,ts}\"",
     "prepublishOnly": "yarn run test && yarn run dist",
     "prettier": "prettier --write \"./source/**/*.{js,json,ts}\"",
     "prettier:ci": "prettier --check \"./source/**/*.{js,json,ts}\"",
-    "test": "yarn run lint && yarn run test:build && yarn run test:mocha",
+    "test": "yarn run test:build && yarn run test:mocha",
     "test:build": "yarn run test:clean && tsc -p tsconfig.json",
     "test:clean": "rimraf build",
     "test:mocha": "mocha build/**/*-spec.js"
