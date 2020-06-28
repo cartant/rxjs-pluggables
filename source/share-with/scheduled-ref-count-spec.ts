@@ -6,17 +6,17 @@
 import { expect } from "chai";
 import { asapScheduler, concat, defer, NEVER, of, queueScheduler } from "rxjs";
 import { finalize } from "rxjs/operators";
-import { refCountOn } from "./ref-count-on";
+import { scheduledRefCount } from "./scheduled-ref-count";
 import { shareWith } from "./share-with";
 
-describe("refCountOn", () => {
+describe("scheduledRefCount", () => {
   it("should support a synchronous source", (done: Mocha.Done) => {
     let unsubscribed = false;
     const values: number[] = [];
     const source = concat(of(1, 2, 3), NEVER).pipe(
       finalize(() => (unsubscribed = true))
     );
-    const shared = source.pipe(shareWith(refCountOn(asapScheduler)));
+    const shared = source.pipe(shareWith(scheduledRefCount(asapScheduler)));
     const subscription = shared.subscribe((value) => values.push(value));
     expect(values).to.deep.equal([]);
     asapScheduler.schedule(() => {
@@ -41,7 +41,7 @@ describe("refCountOn", () => {
 
     queueScheduler.schedule(() => {
       const subscription = source
-        .pipe(shareWith(refCountOn(queueScheduler)))
+        .pipe(shareWith(scheduledRefCount(queueScheduler)))
         .subscribe(() => (received = true));
       subscription.unsubscribe();
     });
@@ -51,7 +51,7 @@ describe("refCountOn", () => {
 
     queueScheduler.schedule(() => {
       const subscription = source
-        .pipe(shareWith(refCountOn(queueScheduler)))
+        .pipe(shareWith(scheduledRefCount(queueScheduler)))
         .subscribe(() => (received = true));
       queueScheduler.schedule(() => {
         subscription.unsubscribe();

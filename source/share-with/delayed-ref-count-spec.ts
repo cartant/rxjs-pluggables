@@ -8,10 +8,10 @@ import { expect } from "chai";
 import { asyncScheduler, concat, defer, NEVER, of, ReplaySubject } from "rxjs";
 import { marbles } from "rxjs-marbles";
 import { finalize } from "rxjs/operators";
-import { refCountDelay } from "./ref-count-delay";
+import { delayedRefCount } from "./delayed-ref-count";
 import { shareWith } from "./share-with";
 
-describe("refCountDelay", () => {
+describe("delayedRefCount", () => {
   it("should support a synchronous source", (done: Mocha.Done) => {
     let unsubscribed = false;
     const values: number[] = [];
@@ -19,7 +19,7 @@ describe("refCountDelay", () => {
     const source = concat(of(1, 2, 3), NEVER).pipe(
       finalize(() => (unsubscribed = true))
     );
-    const shared = source.pipe(shareWith(refCountDelay(10)));
+    const shared = source.pipe(shareWith(delayedRefCount(10)));
 
     const subscription = shared.subscribe((value) => values.push(value));
     expect(values).to.deep.equal([1, 2, 3]);
@@ -41,7 +41,7 @@ describe("refCountDelay", () => {
       ++subscribes;
       return of(1, 2, 3);
     });
-    const shared = source.pipe(shareWith(refCountDelay(0)));
+    const shared = source.pipe(shareWith(delayedRefCount(0)));
 
     shared.subscribe({
       complete() {
@@ -86,7 +86,7 @@ describe("refCountDelay", () => {
       const sharedSub3 = "    --------^----";
       const expected3 = "     ----------4-|";
 
-      const shared = source.pipe(shareWith(refCountDelay(delay)));
+      const shared = source.pipe(shareWith(delayedRefCount(delay)));
       m.expect(source).toHaveSubscriptions([sourceSub1]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
       m.expect(shared, sharedSub2).toBeObservable(expected2);
@@ -108,7 +108,7 @@ describe("refCountDelay", () => {
       const sharedSub3 = "    --------^----";
       const expected3 = "     ----------4-#";
 
-      const shared = source.pipe(shareWith(refCountDelay(delay)));
+      const shared = source.pipe(shareWith(delayedRefCount(delay)));
       m.expect(source).toHaveSubscriptions([sourceSub1]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
       m.expect(shared, sharedSub2).toBeObservable(expected2);
@@ -132,7 +132,7 @@ describe("refCountDelay", () => {
       const sharedSub3 = "    --------^---!--";
       const expected3 = "     ----------4----";
 
-      const shared = source.pipe(shareWith(refCountDelay(delay)));
+      const shared = source.pipe(shareWith(delayedRefCount(delay)));
       m.expect(source).toHaveSubscriptions([sourceSub1]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
       m.expect(shared, sharedSub2).toBeObservable(expected2);
@@ -156,7 +156,7 @@ describe("refCountDelay", () => {
       const sharedSub3 = "    -----------^-!  ";
       const expected3 = "     ------------5-  ";
 
-      const shared = source.pipe(shareWith(refCountDelay(delay)));
+      const shared = source.pipe(shareWith(delayedRefCount(delay)));
       m.expect(source).toHaveSubscriptions([sourceSub1]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
       m.expect(shared, sharedSub2).toBeObservable(expected2);
@@ -181,7 +181,7 @@ describe("refCountDelay", () => {
       const sharedSub3 = "    -----------------^-!  ";
       const expected3 = "     ------------------1-  ";
 
-      const shared = source.pipe(shareWith(refCountDelay(delay)));
+      const shared = source.pipe(shareWith(delayedRefCount(delay)));
       m.expect(source).toHaveSubscriptions([sourceSub1, sourceSub2]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
       m.expect(shared, sharedSub2).toBeObservable(expected2);
@@ -206,17 +206,8 @@ describe("refCountDelay", () => {
       const sharedSub3 = "    -----------------^--     ";
       const expected3 = "     -------------------(r|)  ";
 
-      // Note that when a multicast source completes or errors and effects the
-      // unsubscription of the subject, the subject is nulled. So the following
-      // factory needs to look at what effected the unsubscription and needs to
-      // decide whether or not to reuse the subject.
-
       const shared = source.pipe(
-        shareWith(refCountDelay(delay), (kind, previousSubject) =>
-          kind === "C" && previousSubject
-            ? previousSubject
-            : new ReplaySubject(1)
-        )
+        shareWith(delayedRefCount(delay), () => new ReplaySubject(1))
       );
       m.expect(source).toHaveSubscriptions([sourceSub1, sourceSub2]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);

@@ -3,5 +3,4 @@
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-strategies
  */
 
-export * from "./control";
-export * from "./share-with";
+describe("defaultRefCount", () => {});

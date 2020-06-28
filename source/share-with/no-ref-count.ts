@@ -5,8 +5,16 @@
 
 import { OperatorFunction, Observable } from "rxjs";
 import { asConnectable } from "./as-connectable";
+import { ShareStrategy } from "./types";
 
-export function refCountForever<T>(): OperatorFunction<T, T> {
+export function noRefCount(): ShareStrategy<any> {
+  return (factory) => ({
+    getSubject: (kind, subject) => (kind === "C" && subject) || factory(),
+    operator: noRefCountOperator(),
+  });
+}
+
+export function noRefCountOperator<T>(): OperatorFunction<T, T> {
   return (source) => {
     const connectable = asConnectable(source);
     return new Observable<T>((observer) => {

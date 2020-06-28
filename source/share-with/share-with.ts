@@ -6,30 +6,13 @@
 
 import { OperatorFunction, Subject } from "rxjs";
 import { multicast, tap } from "rxjs/operators";
+import { ShareStrategy } from "./types";
 
 export function shareWith<T>(
-  refCount: OperatorFunction<T, T>,
-  subject?: Subject<T>
-): OperatorFunction<T, T>;
-
-export function shareWith<T>(
-  refCount: OperatorFunction<T, T>,
-  subjectFactory?: (
-    kind: "C" | "E" | undefined,
-    previousSubject: Subject<T> | undefined
-  ) => Subject<T>
-): OperatorFunction<T, T>;
-
-export function shareWith<T>(
-  refCount: OperatorFunction<T, T>,
-  arg:
-    | Subject<T>
-    | ((
-        kind: "C" | "E" | undefined,
-        previousSubject: Subject<T> | undefined
-      ) => Subject<T>) = new Subject<T>()
+  strategy: ShareStrategy<T>,
+  factory: () => Subject<T> = () => new Subject<T>()
 ): OperatorFunction<T, T> {
-  const factory = typeof arg === "function" ? arg : () => arg;
+  const { getSubject, operator } = strategy(factory);
   let kind: "C" | "E" | undefined = undefined;
   let subject: Subject<T> | undefined = undefined;
   return (source) =>
@@ -43,10 +26,10 @@ export function shareWith<T>(
         },
       }),
       multicast(() => {
-        subject = factory(kind, subject);
+        subject = getSubject(kind, subject);
         kind = undefined;
         return subject;
       }),
-      refCount as OperatorFunction<T, T>
+      operator
     );
 }

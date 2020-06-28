@@ -15,8 +15,19 @@ import {
 } from "rxjs";
 import { scan, switchMap, tap } from "rxjs/operators";
 import { asConnectable } from "./as-connectable";
+import { ShareStrategy } from "./types";
 
-export function refCountDelay<T>(
+export function delayedRefCount(
+  delay: number,
+  scheduler: SchedulerLike = asapScheduler
+): ShareStrategy<any> {
+  return (factory) => ({
+    getSubject: (kind, subject) => (kind === "C" && subject) || factory(),
+    operator: delayedRefCountOperator(delay, scheduler),
+  });
+}
+
+export function delayedRefCountOperator<T>(
   delay: number,
   scheduler: SchedulerLike = asapScheduler
 ): OperatorFunction<T, T> {

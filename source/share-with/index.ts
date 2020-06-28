@@ -3,5 +3,8 @@
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-strategies
  */
 
-export * from "./control";
+export * from "./default-ref-count";
+export * from "./delayed-ref-count";
+export * from "./no-ref-count";
+export * from "./scheduled-ref-count";
 export * from "./share-with";

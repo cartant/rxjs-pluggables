@@ -7,17 +7,17 @@ import { expect } from "chai";
 import { concat, of, NEVER } from "rxjs";
 import { marbles } from "rxjs-marbles";
 import { finalize } from "rxjs/operators";
-import { refCountForever } from "./ref-count-forever";
+import { noRefCount } from "./no-ref-count";
 import { shareWith } from "./share-with";
 
-describe("refCountForever", () => {
+describe("noRefCount", () => {
   it("should not unsubscribe from the source", () => {
     let unsubscribed = false;
     const values: number[] = [];
     const source = concat(of(1, 2, 3), NEVER).pipe(
       finalize(() => (unsubscribed = true))
     );
-    const shared = source.pipe(shareWith(refCountForever()));
+    const shared = source.pipe(shareWith(noRefCount()));
     const subscription = shared.subscribe((value) => values.push(value));
     expect(values).to.deep.equal([1, 2, 3]);
     subscription.unsubscribe();
@@ -37,7 +37,7 @@ describe("refCountForever", () => {
       const sharedSub3 = "    --------^----";
       const expected3 = "     ----------4--";
 
-      const shared = source.pipe(shareWith(refCountForever()));
+      const shared = source.pipe(shareWith(noRefCount()));
       m.expect(source).toHaveSubscriptions([sourceSub1]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
       m.expect(shared, sharedSub2).toBeObservable(expected2);
@@ -58,7 +58,7 @@ describe("refCountForever", () => {
       const sharedSub3 = "    --------^---!";
       const expected3 = "     ----------4--";
 
-      const shared = source.pipe(shareWith(refCountForever()));
+      const shared = source.pipe(shareWith(noRefCount()));
       m.expect(source).toHaveSubscriptions([sourceSub1]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
       m.expect(shared, sharedSub2).toBeObservable(expected2);
@@ -79,7 +79,7 @@ describe("refCountForever", () => {
       const sharedSub3 = "    --------^----";
       const expected3 = "     ----------4-|";
 
-      const shared = source.pipe(shareWith(refCountForever()));
+      const shared = source.pipe(shareWith(noRefCount()));
       m.expect(source).toHaveSubscriptions([sourceSub1]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
       m.expect(shared, sharedSub2).toBeObservable(expected2);
@@ -100,7 +100,7 @@ describe("refCountForever", () => {
       const sharedSub3 = "    --------^----";
       const expected3 = "     ----------4-#";
 
-      const shared = source.pipe(shareWith(refCountForever()));
+      const shared = source.pipe(shareWith(noRefCount()));
       m.expect(source).toHaveSubscriptions([sourceSub1]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
       m.expect(shared, sharedSub2).toBeObservable(expected2);

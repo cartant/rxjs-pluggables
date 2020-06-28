@@ -10,8 +10,18 @@ import {
   Subscription,
 } from "rxjs";
 import { asConnectable } from "./as-connectable";
+import { ShareStrategy } from "./types";
 
-export function refCountOn<T>(
+export function scheduledRefCount(
+  scheduler: SchedulerLike
+): ShareStrategy<any> {
+  return (factory) => ({
+    getSubject: (kind, subject) => (kind === "C" && subject) || factory(),
+    operator: scheduledRefCountOperator(scheduler),
+  });
+}
+
+export function scheduledRefCountOperator<T>(
   scheduler: SchedulerLike
 ): OperatorFunction<T, T> {
   return (source) => {

@@ -30,11 +30,14 @@ describe("shareWith", () => {
       const time3 = m.time("  ------|");
 
       const shared = source.pipe(
-        shareWith(refCount(), (k, s) => {
-          kind = k;
-          subject = s;
-          return new Subject<string>();
-        })
+        shareWith((factory) => ({
+          getSubject: (k, s) => {
+            kind = k;
+            subject = s;
+            return factory();
+          },
+          operator: refCount(),
+        }))
       );
       m.expect(source).toHaveSubscriptions([sourceSub1, sourceSub2]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
@@ -75,11 +78,14 @@ describe("shareWith", () => {
       const time3 = m.time("  ------|");
 
       const shared = source.pipe(
-        shareWith(refCount(), (k, s) => {
-          kind = k;
-          subject = s;
-          return new Subject<string>();
-        })
+        shareWith((factory) => ({
+          getSubject: (k, s) => {
+            kind = k;
+            subject = s;
+            return factory();
+          },
+          operator: refCount(),
+        }))
       );
       m.expect(source).toHaveSubscriptions([sourceSub1, sourceSub2]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
@@ -118,11 +124,14 @@ describe("shareWith", () => {
       const time3 = m.time("  ------|");
 
       const shared = source.pipe(
-        shareWith(refCount(), (k, s) => {
-          kind = k;
-          subject = s;
-          return new Subject<string>();
-        })
+        shareWith((factory) => ({
+          getSubject: (k, s) => {
+            kind = k;
+            subject = s;
+            return factory();
+          },
+          operator: refCount(),
+        }))
       );
       m.expect(source).toHaveSubscriptions([sharedSub1, sharedSub2]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
@@ -156,8 +165,12 @@ describe("shareWith", () => {
       const expected2 = "     ---(b|)-";
 
       const shared = source.pipe(
-        shareWith(refCount(), (kind, subject) =>
-          kind === "C" && subject ? subject : new ReplaySubject<string>(1)
+        shareWith(
+          (factory) => ({
+            getSubject: (k, s) => (k === "C" && s) || factory(),
+            operator: refCount(),
+          }),
+          () => new ReplaySubject(1)
         )
       );
       m.expect(source).toHaveSubscriptions([sourceSub1]);
