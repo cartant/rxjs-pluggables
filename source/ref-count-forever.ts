@@ -10,9 +10,9 @@ export function refCountForever<T>(): OperatorFunction<T, T> {
   return (source) => {
     const connectable = asConnectable(source);
     return new Observable<T>((observer) => {
-      /* eslint-disable-next-line rxjs/no-ignored-subscription */
-      connectable.subscribe(observer);
+      const subscription = connectable.subscribe(observer);
       connectable.connect();
+      return subscription;
     });
   };
 }

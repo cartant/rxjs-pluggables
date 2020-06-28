@@ -4,7 +4,7 @@
  */
 
 import { expect } from "chai";
-import { asapScheduler, concat, NEVER, of } from "rxjs";
+import { asapScheduler, concat, defer, NEVER, of, queueScheduler } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { refCountOn } from "./ref-count-on";
 import { shareWith } from "./share-with";
@@ -28,5 +28,37 @@ describe("refCountOn", () => {
       expect(unsubscribed).to.be.true;
       done();
     }, 10);
+  });
+
+  it("should support queue-scheduled actions", () => {
+    let received = false;
+    let subscribed = false;
+
+    const source = defer(() => {
+      subscribed = true;
+      return of(42);
+    });
+
+    queueScheduler.schedule(() => {
+      const subscription = source
+        .pipe(shareWith(refCountOn(queueScheduler)))
+        .subscribe(() => (received = true));
+      subscription.unsubscribe();
+    });
+
+    expect(received).to.be.false;
+    expect(subscribed).to.be.false;
+
+    queueScheduler.schedule(() => {
+      const subscription = source
+        .pipe(shareWith(refCountOn(queueScheduler)))
+        .subscribe(() => (received = true));
+      queueScheduler.schedule(() => {
+        subscription.unsubscribe();
+      });
+    });
+
+    expect(received).to.be.true;
+    expect(subscribed).to.be.true;
   });
 });

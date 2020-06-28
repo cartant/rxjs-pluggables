@@ -43,7 +43,7 @@ export function refCountDelay<T>(
             })
           );
         }
-        if (!connectableSubscription && count > 0) {
+        if (count > 0 && !connectableSubscription) {
           connectableSubscription = connectable.connect();
         }
         return NEVER;
@@ -55,8 +55,12 @@ export function refCountDelay<T>(
         connectorSubscription = connector.subscribe();
       }
       const subscription = connectable.subscribe(observer);
-      subscription.add(() => notifier.next(-1));
       notifier.next(1);
+      // The decrementing teardown is added *after* the increment to ensure the
+      // reference count cannot go negative. If the source completes
+      // synchronously, the decrementing teardown will run when it's added to
+      // the subscription.
+      subscription.add(() => notifier.next(-1));
       return subscription;
     });
   };
