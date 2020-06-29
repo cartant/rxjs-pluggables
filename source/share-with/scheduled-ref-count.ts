@@ -10,7 +10,7 @@ import {
   Subscription,
 } from "rxjs";
 import { closedSubscription } from "./closed-subscription";
-import { ShareStrategy } from "./types";
+import { ShareStrategy } from "./share-strategy";
 
 export function scheduledRefCount(scheduler: SchedulerLike): ShareStrategy {
   return {

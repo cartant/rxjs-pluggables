@@ -6,7 +6,7 @@
 import { defer, OperatorFunction, Subject, Subscription } from "rxjs";
 import { tap } from "rxjs/operators";
 import { closedSubscription } from "./closed-subscription";
-import { ShareStrategy } from "./types";
+import { ShareStrategy } from "./share-strategy";
 
 export function shareWith<T>(
   strategy: ShareStrategy,
