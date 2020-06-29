@@ -7,11 +7,11 @@ import { Observable, OperatorFunction, Subscription } from "rxjs";
 import { closedSubscription } from "./closed-subscription";
 import { ShareStrategy } from "./types";
 
-export function defaultRefCount(): ShareStrategy<any> {
-  return (factory) => ({
+export function defaultRefCount(): ShareStrategy {
+  return {
     operator: (connect) => defaultRefCountOperator(connect),
-    reuseSubject: () => factory(),
-  });
+    reuseSubject: () => false,
+  };
 }
 
 export function defaultRefCountOperator<T>(

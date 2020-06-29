@@ -9,20 +9,26 @@ import { closedSubscription } from "./closed-subscription";
 import { ShareStrategy } from "./types";
 
 export function shareWith<T>(
-  strategy: ShareStrategy<T>,
+  strategy: ShareStrategy,
   factory: () => Subject<T> = () => new Subject<T>()
 ): OperatorFunction<T, T> {
-  const { operator, reuseSubject } = strategy(factory);
+  const { operator, reuseSubject } = strategy;
   let kind: "C" | "E" | undefined = undefined;
   let subject: Subject<T> | undefined = undefined;
-  let subjectSubscription = closedSubscription;
 
   return (source) => {
     function connect(): Subscription {
       if (!subject || subject.isStopped) {
         return closedSubscription as Subscription;
       }
-      return (subjectSubscription = source
+      // The lifetime of the subject is not bound to the lifetime of the source
+      // subscription. The subject remains available for reuse until the
+      // strategy indicates it is not to be reused or until the operator calls
+      // unsubscribe of the subscription returned from connect - which
+      // indicates that the operator no longer needs the shared subject.
+      const reusableSubject = subject;
+      const reusableSubjectSubscription = new Subscription();
+      const sourceSubscription = source
         .pipe(
           tap({
             complete() {
@@ -33,14 +39,23 @@ export function shareWith<T>(
             },
           })
         )
-        .subscribe(subject));
+        .subscribe(reusableSubject);
+      sourceSubscription.add(() => {
+        if (!reuseSubject({ kind, shared: true, subject: reusableSubject })) {
+          subject = undefined;
+          reusableSubjectSubscription.unsubscribe();
+        }
+      });
+      reusableSubjectSubscription.add(sourceSubscription);
+      reusableSubjectSubscription.add(() => {
+        if (!reuseSubject({ kind, shared: false, subject: reusableSubject })) {
+          subject = undefined;
+        }
+      });
+      return reusableSubjectSubscription;
     }
-    return defer(() => {
-      if (!subject || subject.isStopped || subjectSubscription.closed) {
-        subject = reuseSubject(kind, subject);
-        kind = undefined;
-      }
-      return subject;
-    }).pipe(operator(connect));
+    return defer(() => subject || (subject = factory())).pipe(
+      operator(connect)
+    );
   };
 }

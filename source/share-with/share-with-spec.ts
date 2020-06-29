@@ -30,14 +30,14 @@ describe("shareWith", () => {
       const time3 = m.time("  ------|");
 
       const shared = source.pipe(
-        shareWith((factory) => ({
+        shareWith({
           operator: (connect) => defaultRefCountOperator(connect),
-          reuseSubject: (k, s) => {
-            kind = k;
-            subject = s;
-            return factory();
+          reuseSubject: (state) => {
+            kind = state.kind;
+            subject = state.subject;
+            return false;
           },
-        }))
+        })
       );
       m.expect(source).toHaveSubscriptions([sourceSub1, sourceSub2]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
@@ -78,14 +78,14 @@ describe("shareWith", () => {
       const time3 = m.time("  ------|");
 
       const shared = source.pipe(
-        shareWith((factory) => ({
+        shareWith({
           operator: (connect) => defaultRefCountOperator(connect),
-          reuseSubject: (k, s) => {
-            kind = k;
-            subject = s;
-            return factory();
+          reuseSubject: (state) => {
+            kind = state.kind;
+            subject = state.subject;
+            return false;
           },
-        }))
+        })
       );
       m.expect(source).toHaveSubscriptions([sourceSub1, sourceSub2]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
@@ -124,14 +124,14 @@ describe("shareWith", () => {
       const time3 = m.time("  ------|");
 
       const shared = source.pipe(
-        shareWith((factory) => ({
+        shareWith({
           operator: (connect) => defaultRefCountOperator(connect),
-          reuseSubject: (k, s) => {
-            kind = k;
-            subject = s;
-            return factory();
+          reuseSubject: (state) => {
+            kind = state.kind;
+            subject = state.subject;
+            return false;
           },
-        }))
+        })
       );
       m.expect(source).toHaveSubscriptions([sharedSub1, sharedSub2]);
       m.expect(shared, sharedSub1).toBeObservable(expected1);
@@ -166,11 +166,10 @@ describe("shareWith", () => {
 
       const shared = source.pipe(
         shareWith(
-          (factory) => ({
+          {
             operator: (connect) => defaultRefCountOperator(connect),
-            reuseSubject: (kind, subject) =>
-              (kind === "C" && subject) || factory(),
-          }),
+            reuseSubject: () => true,
+          },
           () => new ReplaySubject(1)
         )
       );

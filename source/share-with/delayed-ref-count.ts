@@ -20,11 +20,11 @@ import { ShareStrategy } from "./types";
 export function delayedRefCount(
   delay: number,
   scheduler: SchedulerLike = asapScheduler
-): ShareStrategy<any> {
-  return (factory) => ({
+): ShareStrategy {
+  return {
     operator: (connect) => delayedRefCountOperator(connect, delay, scheduler),
-    reuseSubject: (kind, subject) => (kind === "C" && subject) || factory(),
-  });
+    reuseSubject: ({ kind, shared }) => shared && kind === "C",
+  };
 }
 
 export function delayedRefCountOperator<T>(

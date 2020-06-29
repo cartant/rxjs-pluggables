@@ -7,11 +7,11 @@ import { OperatorFunction, Observable, Subscription } from "rxjs";
 import { closedSubscription } from "./closed-subscription";
 import { ShareStrategy } from "./types";
 
-export function noRefCount(): ShareStrategy<any> {
-  return (factory) => ({
+export function noRefCount(): ShareStrategy {
+  return {
     operator: (connect) => noRefCountOperator(connect),
-    reuseSubject: (kind, subject) => (kind === "C" && subject) || factory(),
-  });
+    reuseSubject: () => false,
+  };
 }
 
 export function noRefCountOperator<T>(

@@ -12,13 +12,11 @@ import {
 import { closedSubscription } from "./closed-subscription";
 import { ShareStrategy } from "./types";
 
-export function scheduledRefCount(
-  scheduler: SchedulerLike
-): ShareStrategy<any> {
-  return (factory) => ({
+export function scheduledRefCount(scheduler: SchedulerLike): ShareStrategy {
+  return {
     operator: (connect) => scheduledRefCountOperator(connect, scheduler),
-    reuseSubject: (kind, subject) => (kind === "C" && subject) || factory(),
-  });
+    reuseSubject: ({ kind, shared }) => shared && kind === "C",
+  };
 }
 
 export function scheduledRefCountOperator<T>(
