@@ -32,7 +32,7 @@ describe("delayedRefCount", () => {
     }, 20);
   });
 
-  it("should support multiple subscriptions to a synchronous source", (done: Mocha.Done) => {
+  it("should share multiple subscriptions to a synchronous source", (done: Mocha.Done) => {
     let completes = 0;
     let subscribes = 0;
     const values: number[] = [];
