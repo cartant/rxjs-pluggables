@@ -26,8 +26,8 @@ export function shareWith<T>(
       // strategy indicates it is not to be reused or until the operator calls
       // unsubscribe on the subscription returned from connect - which
       // indicates that the operator no longer needs the shared subject.
-      const reusableSubject = subject;
-      const reusableSubjectSubscription = new Subscription();
+      const connectSubject = subject;
+      const connectSubscription = new Subscription();
       const sourceSubscription = source
         .pipe(
           tap({
@@ -39,24 +39,24 @@ export function shareWith<T>(
             },
           })
         )
-        .subscribe(reusableSubject);
+        .subscribe(connectSubject);
       sourceSubscription.add(() => {
-        if (!reuseSubject({ kind, shared: true, subject: reusableSubject })) {
+        if (!reuseSubject({ kind, shared: true, subject: connectSubject })) {
           subject = undefined;
-          reusableSubjectSubscription.unsubscribe();
+          connectSubscription.unsubscribe();
         }
       });
       // Although the subject's lifetime is not bound to the source
       // subscription, the reverse is not true. If the operator no longer needs
       // the subject - and unsubscribes from the subscription returned from
       // connect - the subject should be unsubscribed from the source.
-      reusableSubjectSubscription.add(sourceSubscription);
-      reusableSubjectSubscription.add(() => {
-        if (!reuseSubject({ kind, shared: false, subject: reusableSubject })) {
+      connectSubscription.add(sourceSubscription);
+      connectSubscription.add(() => {
+        if (!reuseSubject({ kind, shared: false, subject: connectSubject })) {
           subject = undefined;
         }
       });
-      return reusableSubjectSubscription;
+      return connectSubscription;
     }
     return defer(() => subject || (subject = factory())).pipe(
       operator(connect)
