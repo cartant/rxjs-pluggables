@@ -23,16 +23,16 @@ export function scheduledRefCountOperator<T>(
   connect: () => Subscription,
   scheduler: SchedulerLike
 ): OperatorFunction<T, T> {
-  return (connectable) => {
-    let connectableSubscription = closedSubscription;
+  return (source) => {
+    let connectSubscription = closedSubscription;
     let count = 0;
     return new Observable<T>((observer) => {
       ++count;
-      const subscription = connectable.subscribe(observer);
+      const subscription = source.subscribe(observer);
       subscription.add(
         scheduler.schedule(() => {
-          if (count > 0 && connectableSubscription.closed) {
-            connectableSubscription = connect();
+          if (count > 0 && connectSubscription.closed) {
+            connectSubscription = connect();
           }
         })
       );
@@ -40,7 +40,7 @@ export function scheduledRefCountOperator<T>(
         --count;
         scheduler.schedule(() => {
           if (count === 0) {
-            connectableSubscription.unsubscribe();
+            connectSubscription.unsubscribe();
           }
         });
       });

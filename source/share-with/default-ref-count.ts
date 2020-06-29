@@ -17,18 +17,18 @@ export function defaultRefCount(): ShareStrategy {
 export function defaultRefCountOperator<T>(
   connect: () => Subscription
 ): OperatorFunction<T, T> {
-  return (connectable) => {
-    let connectableSubscription = closedSubscription;
+  return (source) => {
+    let connectSubscription = closedSubscription;
     let count = 0;
 
     return new Observable<T>((observer) => {
-      const subscription = connectable.subscribe(observer);
+      const subscription = source.subscribe(observer);
       if (++count === 1) {
-        connectableSubscription = connect();
+        connectSubscription = connect();
       }
       subscription.add(() => {
         if (--count === 0) {
-          connectableSubscription.unsubscribe();
+          connectSubscription.unsubscribe();
         }
       });
       return subscription;

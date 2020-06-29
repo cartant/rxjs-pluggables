@@ -32,8 +32,8 @@ export function delayedRefCountOperator<T>(
   delay: number,
   scheduler: SchedulerLike = asapScheduler
 ): OperatorFunction<T, T> {
-  return (connectable) => {
-    let connectableSubscription = closedSubscription;
+  return (source) => {
+    let connectSubscription = closedSubscription;
     let connectorSubscription = closedSubscription;
 
     const notifier = new Subject<number>();
@@ -43,13 +43,13 @@ export function delayedRefCountOperator<T>(
         if (count === 0) {
           return timer(delay, scheduler).pipe(
             tap(() => {
-              connectableSubscription.unsubscribe();
+              connectSubscription.unsubscribe();
               connectorSubscription.unsubscribe();
             })
           );
         }
-        if (count > 0 && connectableSubscription.closed) {
-          connectableSubscription = connect();
+        if (count > 0 && connectSubscription.closed) {
+          connectSubscription = connect();
         }
         return NEVER;
       })
@@ -59,7 +59,7 @@ export function delayedRefCountOperator<T>(
       if (connectorSubscription.closed) {
         connectorSubscription = connector.subscribe();
       }
-      const subscription = connectable.subscribe(observer);
+      const subscription = source.subscribe(observer);
       notifier.next(1);
       // The decrementing teardown is added *after* the increment to ensure the
       // reference count cannot go negative. If the source completes

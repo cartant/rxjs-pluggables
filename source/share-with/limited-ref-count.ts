@@ -18,18 +18,18 @@ export function limitedRefCountOperator<T>(
   connect: () => Subscription,
   limit: number
 ): OperatorFunction<T, T> {
-  return (connectable) => {
-    let connectableSubscription = closedSubscription;
+  return (source) => {
+    let connectSubscription = closedSubscription;
     let count = 0;
 
     return new Observable<T>((observer) => {
-      const subscription = connectable.subscribe(observer);
+      const subscription = source.subscribe(observer);
       if (++count === limit) {
-        connectableSubscription = connect();
+        connectSubscription = connect();
       }
       subscription.add(() => {
         if (--count < limit) {
-          connectableSubscription.unsubscribe();
+          connectSubscription.unsubscribe();
         }
       });
       return subscription;

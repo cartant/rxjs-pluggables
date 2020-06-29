@@ -17,13 +17,13 @@ export function noRefCount(): ShareStrategy {
 export function noRefCountOperator<T>(
   connect: () => Subscription
 ): OperatorFunction<T, T> {
-  return (connectable) => {
-    let connectableSubscription = closedSubscription;
+  return (source) => {
+    let connectSubscription = closedSubscription;
 
     return new Observable<T>((observer) => {
-      const subscription = connectable.subscribe(observer);
-      if (connectableSubscription.closed) {
-        connectableSubscription = connect();
+      const subscription = source.subscribe(observer);
+      if (connectSubscription.closed) {
+        connectSubscription = connect();
       }
       return subscription;
     });
