@@ -3,12 +3,35 @@
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-strategies
  */
 
-import { refCount } from "rxjs/operators";
+import { Observable, OperatorFunction, Subscription } from "rxjs";
+import { closedSubscription } from "./closed-subscription";
 import { ShareStrategy } from "./types";
 
 export function defaultRefCount(): ShareStrategy<any> {
   return (factory) => ({
-    getSubject: (kind, subject) => factory(),
-    operator: refCount(),
+    operator: (connect) => defaultRefCountOperator(connect),
+    reuseSubject: () => factory(),
   });
+}
+
+export function defaultRefCountOperator<T>(
+  connect: () => Subscription
+): OperatorFunction<T, T> {
+  return (connectable) => {
+    let connectableSubscription = closedSubscription;
+    let count = 0;
+
+    return new Observable<T>((observer) => {
+      const subscription = connectable.subscribe(observer);
+      if (++count === 1) {
+        connectableSubscription = connect();
+      }
+      subscription.add(() => {
+        if (--count === 0) {
+          connectableSubscription.unsubscribe();
+        }
+      });
+      return subscription;
+    });
+  };
 }

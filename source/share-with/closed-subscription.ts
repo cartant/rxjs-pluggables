@@ -3,9 +3,10 @@
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-strategies
  */
 
-import { noop, SubscriptionLike } from "rxjs";
+import { Subscription } from "rxjs";
 
-export const closedSubscription: SubscriptionLike = {
-  closed: true,
-  unsubscribe: noop,
-};
+export const closedSubscription = (function () {
+  const subscription = new Subscription();
+  subscription.unsubscribe();
+  return subscription;
+})();

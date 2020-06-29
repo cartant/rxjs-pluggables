@@ -3,8 +3,12 @@
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-strategies
  */
 
-import { Observable, OperatorFunction, SchedulerLike } from "rxjs";
-import { asConnectable } from "./as-connectable";
+import {
+  Observable,
+  OperatorFunction,
+  SchedulerLike,
+  Subscription,
+} from "rxjs";
 import { closedSubscription } from "./closed-subscription";
 import { ShareStrategy } from "./types";
 
@@ -12,16 +16,16 @@ export function scheduledRefCount(
   scheduler: SchedulerLike
 ): ShareStrategy<any> {
   return (factory) => ({
-    getSubject: (kind, subject) => (kind === "C" && subject) || factory(),
-    operator: scheduledRefCountOperator(scheduler),
+    operator: (connect) => scheduledRefCountOperator(connect, scheduler),
+    reuseSubject: (kind, subject) => (kind === "C" && subject) || factory(),
   });
 }
 
 export function scheduledRefCountOperator<T>(
+  connect: () => Subscription,
   scheduler: SchedulerLike
 ): OperatorFunction<T, T> {
-  return (source) => {
-    const connectable = asConnectable(source);
+  return (connectable) => {
     let connectableSubscription = closedSubscription;
     let count = 0;
     return new Observable<T>((observer) => {
@@ -30,7 +34,7 @@ export function scheduledRefCountOperator<T>(
       subscription.add(
         scheduler.schedule(() => {
           if (count > 0 && connectableSubscription.closed) {
-            connectableSubscription = connectable.connect();
+            connectableSubscription = connect();
           }
         })
       );

@@ -6,7 +6,7 @@
 import { expect } from "chai";
 import { ReplaySubject, Subject } from "rxjs";
 import { marbles } from "rxjs-marbles";
-import { refCount } from "rxjs/operators";
+import { defaultRefCountOperator } from "./default-ref-count";
 import { shareWith } from "./share-with";
 
 describe("shareWith", () => {
@@ -31,12 +31,12 @@ describe("shareWith", () => {
 
       const shared = source.pipe(
         shareWith((factory) => ({
-          getSubject: (k, s) => {
+          operator: (connect) => defaultRefCountOperator(connect),
+          reuseSubject: (k, s) => {
             kind = k;
             subject = s;
             return factory();
           },
-          operator: refCount(),
         }))
       );
       m.expect(source).toHaveSubscriptions([sourceSub1, sourceSub2]);
@@ -79,12 +79,12 @@ describe("shareWith", () => {
 
       const shared = source.pipe(
         shareWith((factory) => ({
-          getSubject: (k, s) => {
+          operator: (connect) => defaultRefCountOperator(connect),
+          reuseSubject: (k, s) => {
             kind = k;
             subject = s;
             return factory();
           },
-          operator: refCount(),
         }))
       );
       m.expect(source).toHaveSubscriptions([sourceSub1, sourceSub2]);
@@ -125,12 +125,12 @@ describe("shareWith", () => {
 
       const shared = source.pipe(
         shareWith((factory) => ({
-          getSubject: (k, s) => {
+          operator: (connect) => defaultRefCountOperator(connect),
+          reuseSubject: (k, s) => {
             kind = k;
             subject = s;
             return factory();
           },
-          operator: refCount(),
         }))
       );
       m.expect(source).toHaveSubscriptions([sharedSub1, sharedSub2]);
@@ -167,8 +167,9 @@ describe("shareWith", () => {
       const shared = source.pipe(
         shareWith(
           (factory) => ({
-            getSubject: (k, s) => (k === "C" && s) || factory(),
-            operator: refCount(),
+            operator: (connect) => defaultRefCountOperator(connect),
+            reuseSubject: (kind, subject) =>
+              (kind === "C" && subject) || factory(),
           }),
           () => new ReplaySubject(1)
         )

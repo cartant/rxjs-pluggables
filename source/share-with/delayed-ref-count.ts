@@ -11,9 +11,9 @@ import {
   SchedulerLike,
   Subject,
   timer,
+  Subscription,
 } from "rxjs";
 import { scan, switchMap, tap } from "rxjs/operators";
-import { asConnectable } from "./as-connectable";
 import { closedSubscription } from "./closed-subscription";
 import { ShareStrategy } from "./types";
 
@@ -22,17 +22,17 @@ export function delayedRefCount(
   scheduler: SchedulerLike = asapScheduler
 ): ShareStrategy<any> {
   return (factory) => ({
-    getSubject: (kind, subject) => (kind === "C" && subject) || factory(),
-    operator: delayedRefCountOperator(delay, scheduler),
+    operator: (connect) => delayedRefCountOperator(connect, delay, scheduler),
+    reuseSubject: (kind, subject) => (kind === "C" && subject) || factory(),
   });
 }
 
 export function delayedRefCountOperator<T>(
+  connect: () => Subscription,
   delay: number,
   scheduler: SchedulerLike = asapScheduler
 ): OperatorFunction<T, T> {
-  return (source) => {
-    const connectable = asConnectable(source);
+  return (connectable) => {
     let connectableSubscription = closedSubscription;
     let connectorSubscription = closedSubscription;
 
@@ -49,7 +49,7 @@ export function delayedRefCountOperator<T>(
           );
         }
         if (count > 0 && connectableSubscription.closed) {
-          connectableSubscription = connectable.connect();
+          connectableSubscription = connect();
         }
         return NEVER;
       })
