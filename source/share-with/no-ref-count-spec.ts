@@ -12,16 +12,16 @@ import { shareWith } from "./share-with";
 
 describe("noRefCount", () => {
   it("should not unsubscribe from the source", () => {
-    let unsubscribed = false;
+    let unsubscribes = 0;
     const values: number[] = [];
     const source = concat(of(1, 2, 3), NEVER).pipe(
-      finalize(() => (unsubscribed = true))
+      finalize(() => ++unsubscribes)
     );
     const shared = source.pipe(shareWith(noRefCount()));
     const subscription = shared.subscribe((value) => values.push(value));
     expect(values).to.deep.equal([1, 2, 3]);
     subscription.unsubscribe();
-    expect(unsubscribed).to.be.false;
+    expect(unsubscribes).to.equal(0);
   });
 
   it(

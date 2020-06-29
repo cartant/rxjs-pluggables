@@ -13,18 +13,18 @@ import { shareWith } from "./share-with";
 
 describe("defaultRefCount", () => {
   it("should support a synchronous source", () => {
-    let unsubscribed = false;
+    let unsubscribes = 0;
     const values: number[] = [];
 
     const source = concat(of(1, 2, 3), NEVER).pipe(
-      finalize(() => (unsubscribed = true))
+      finalize(() => ++unsubscribes)
     );
     const shared = source.pipe(shareWith(defaultRefCount()));
 
     const subscription = shared.subscribe((value) => values.push(value));
     expect(values).to.deep.equal([1, 2, 3]);
     subscription.unsubscribe();
-    expect(unsubscribed).to.be.true;
+    expect(unsubscribes).to.equal(1);
   });
 
   it("should not share multiple subscriptions to a synchronous source", () => {
@@ -72,9 +72,9 @@ describe("defaultRefCount", () => {
       const sourceSub2 = "    --------^-----!";
 
       const sharedSub1 = "    ^--------------";
-      const expected1 = "     -1-2-3|";
+      const expected1 = "     -1-2-3|        ";
       const sharedSub2 = "    ----^----------";
-      const expected2 = "     -----3|";
+      const expected2 = "     -----3|        ";
       const sharedSub3 = "    --------^------";
       const expected3 = "     ---------1-2-3|";
 

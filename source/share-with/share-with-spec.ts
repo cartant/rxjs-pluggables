@@ -155,9 +155,9 @@ describe("shareWith", () => {
   it(
     "should be able to reuse the subject",
     marbles((m) => {
-      const source = m.cold(" ab|");
+      const source = m.cold(" ab|     ");
       //                      ab|
-      const sourceSub1 = "    ^-!";
+      const sourceSub1 = "    ^-!     ";
       const sharedSub1 = "    ^-------";
       const expected1 = "     ab|-----";
       //                         ab|

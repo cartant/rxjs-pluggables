@@ -5,6 +5,7 @@
 
 export * from "./default-ref-count";
 export * from "./delayed-ref-count";
+export * from "./limited-ref-count";
 export * from "./no-ref-count";
 export * from "./scheduled-ref-count";
 export * from "./share-strategy";
