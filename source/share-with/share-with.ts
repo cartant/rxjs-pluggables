@@ -24,7 +24,7 @@ export function shareWith<T>(
       // The lifetime of the subject is not bound to the lifetime of the source
       // subscription. The subject remains available for reuse until the
       // strategy indicates it is not to be reused or until the operator calls
-      // unsubscribe of the subscription returned from connect - which
+      // unsubscribe on the subscription returned from connect - which
       // indicates that the operator no longer needs the shared subject.
       const reusableSubject = subject;
       const reusableSubjectSubscription = new Subscription();
@@ -46,6 +46,10 @@ export function shareWith<T>(
           reusableSubjectSubscription.unsubscribe();
         }
       });
+      // Although the subject's lifetime is not bound to the source
+      // subscription, the reverse is not true. If the operator no longer needs
+      // the subject - and unsubscribes from the subscription returned from
+      // connect - the subject should be unsubscribed from the source.
       reusableSubjectSubscription.add(sourceSubscription);
       reusableSubjectSubscription.add(() => {
         if (!reuseSubject({ kind, shared: false, subject: reusableSubject })) {
