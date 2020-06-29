@@ -10,11 +10,11 @@ import {
   OperatorFunction,
   SchedulerLike,
   Subject,
-  Subscription,
   timer,
 } from "rxjs";
 import { scan, switchMap, tap } from "rxjs/operators";
 import { asConnectable } from "./as-connectable";
+import { closedSubscription } from "./closed-subscription";
 import { ShareStrategy } from "./types";
 
 export function delayedRefCount(
@@ -33,8 +33,8 @@ export function delayedRefCountOperator<T>(
 ): OperatorFunction<T, T> {
   return (source) => {
     const connectable = asConnectable(source);
-    let connectableSubscription: Subscription | undefined = undefined;
-    let connectorSubscription: Subscription | undefined = undefined;
+    let connectableSubscription = closedSubscription;
+    let connectorSubscription = closedSubscription;
 
     const notifier = new Subject<number>();
     const connector = notifier.pipe(
@@ -43,18 +43,12 @@ export function delayedRefCountOperator<T>(
         if (count === 0) {
           return timer(delay, scheduler).pipe(
             tap(() => {
-              if (connectableSubscription) {
-                connectableSubscription.unsubscribe();
-                connectableSubscription = undefined;
-              }
-              if (connectorSubscription) {
-                connectorSubscription.unsubscribe();
-                connectorSubscription = undefined;
-              }
+              connectableSubscription.unsubscribe();
+              connectorSubscription.unsubscribe();
             })
           );
         }
-        if (count > 0 && !connectableSubscription) {
+        if (count > 0 && connectableSubscription.closed) {
           connectableSubscription = connectable.connect();
         }
         return NEVER;
@@ -62,7 +56,7 @@ export function delayedRefCountOperator<T>(
     );
 
     return new Observable<T>((observer) => {
-      if (!connectorSubscription) {
+      if (connectorSubscription.closed) {
         connectorSubscription = connector.subscribe();
       }
       const subscription = connectable.subscribe(observer);

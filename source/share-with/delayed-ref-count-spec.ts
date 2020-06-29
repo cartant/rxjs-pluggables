@@ -190,6 +190,36 @@ describe("delayedRefCount", () => {
   );
 
   it(
+    "should retry",
+    marbles((m) => {
+      const source = m.cold(" -1-2-#---------------  ");
+      const sourceSub1 = "    ^----!                 ";
+      const sourceSub2 = "    ------^----!           ";
+      const sourceSub3 = "    ---------------^----!  ";
+      const delay = m.time("       --|               ");
+      //                           --|
+      const sharedSub1 = "    ^-----                 ";
+      const expected1 = "     -1-2-#                 ";
+      //                                 --|
+      const sharedSub2 = "    ------^-----           ";
+      const expected2 = "     -------1-2-#           ";
+      //                                          --|
+      const sharedSub3 = "    ---------------^-----  ";
+      const expected3 = "     ----------------1-2-#  ";
+
+      const shared = source.pipe(shareWith(delayedRefCount(delay)));
+      m.expect(source).toHaveSubscriptions([
+        sourceSub1,
+        sourceSub2,
+        sourceSub3,
+      ]);
+      m.expect(shared, sharedSub1).toBeObservable(expected1);
+      m.expect(shared, sharedSub2).toBeObservable(expected2);
+      m.expect(shared, sharedSub3).toBeObservable(expected3);
+    })
+  );
+
+  it(
     "should support a ReplaySubject",
     marbles((m) => {
       const source = m.cold(" --(r|)                   ");
@@ -200,7 +230,7 @@ describe("delayedRefCount", () => {
       const sharedSub1 = "    ^--                      ";
       const expected1 = "     --(r|)                   ";
       //                            -----|
-      const sharedSub2 = "    ------^--                ";
+      const sharedSub2 = "    ------^                  ";
       const expected2 = "     ------(r|)               ";
       //                                         -----|
       const sharedSub3 = "    -----------------^--     ";
