@@ -7,7 +7,7 @@ import { OperatorFunction, Subject, Subscription } from "rxjs";
 
 export type ShareStrategy = {
   operator: (connect: () => Subscription) => OperatorFunction<any, any>;
-  reuseSubject: (state: {
+  shouldReuseSubject: (state: {
     connected: boolean;
     kind: "C" | "E" | undefined;
     subject: Subject<any>;

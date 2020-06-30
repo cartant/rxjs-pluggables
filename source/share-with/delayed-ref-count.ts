@@ -23,7 +23,7 @@ export function delayedRefCount(
 ): ShareStrategy {
   return {
     operator: (connect) => delayedRefCountOperator(connect, delay, scheduler),
-    reuseSubject: ({ connected, kind }) => connected && kind === "C",
+    shouldReuseSubject: ({ connected, kind }) => connected && kind === "C",
   };
 }
 

@@ -10,7 +10,7 @@ import { ShareStrategy } from "./share-strategy";
 export function limitedRefCount(limit: number): ShareStrategy {
   return {
     operator: (connect) => limitedRefCountOperator(connect, limit),
-    reuseSubject: () => true,
+    shouldReuseSubject: () => true,
   };
 }
 

@@ -10,7 +10,7 @@ import { ShareStrategy } from "./share-strategy";
 export function noRefCount(): ShareStrategy {
   return {
     operator: (connect) => noRefCountOperator(connect),
-    reuseSubject: () => false,
+    shouldReuseSubject: () => false,
   };
 }
 

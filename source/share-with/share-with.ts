@@ -12,7 +12,7 @@ export function shareWith<T>(
   strategy: ShareStrategy,
   factory: () => Subject<T> = () => new Subject<T>()
 ): OperatorFunction<T, T> {
-  const { operator, reuseSubject } = strategy;
+  const { operator, shouldReuseSubject } = strategy;
   let kind: "C" | "E" | undefined = undefined;
   let subject: Subject<T> | undefined = undefined;
 
@@ -42,7 +42,7 @@ export function shareWith<T>(
         .subscribe(connectSubject);
       sourceSubscription.add(() => {
         if (
-          !reuseSubject({
+          !shouldReuseSubject({
             connected: true,
             kind,
             subject: connectSubject,
@@ -59,7 +59,7 @@ export function shareWith<T>(
       connectSubscription.add(sourceSubscription);
       connectSubscription.add(() => {
         if (
-          !reuseSubject({
+          !shouldReuseSubject({
             connected: false,
             kind,
             subject: connectSubject,

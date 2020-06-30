@@ -32,7 +32,7 @@ describe("shareWith", () => {
       const shared = source.pipe(
         shareWith({
           operator: (connect) => defaultRefCountOperator(connect),
-          reuseSubject: (state) => {
+          shouldReuseSubject: (state) => {
             kind = state.kind;
             subject = state.subject;
             return false;
@@ -80,7 +80,7 @@ describe("shareWith", () => {
       const shared = source.pipe(
         shareWith({
           operator: (connect) => defaultRefCountOperator(connect),
-          reuseSubject: (state) => {
+          shouldReuseSubject: (state) => {
             kind = state.kind;
             subject = state.subject;
             return false;
@@ -126,7 +126,7 @@ describe("shareWith", () => {
       const shared = source.pipe(
         shareWith({
           operator: (connect) => defaultRefCountOperator(connect),
-          reuseSubject: (state) => {
+          shouldReuseSubject: (state) => {
             kind = state.kind;
             subject = state.subject;
             return false;
@@ -168,7 +168,7 @@ describe("shareWith", () => {
         shareWith(
           {
             operator: (connect) => defaultRefCountOperator(connect),
-            reuseSubject: () => true,
+            shouldReuseSubject: () => true,
           },
           () => new ReplaySubject(1)
         )
