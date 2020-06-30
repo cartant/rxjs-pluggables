@@ -15,7 +15,7 @@ import { ShareStrategy } from "./share-strategy";
 export function scheduledRefCount(scheduler: SchedulerLike): ShareStrategy {
   return {
     operator: (connect) => scheduledRefCountOperator(connect, scheduler),
-    reuseSubject: ({ kind, shared }) => shared && kind === "C",
+    reuseSubject: ({ connected, kind }) => connected && kind === "C",
   };
 }
 

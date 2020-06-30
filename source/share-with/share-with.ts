@@ -41,7 +41,13 @@ export function shareWith<T>(
         )
         .subscribe(connectSubject);
       sourceSubscription.add(() => {
-        if (!reuseSubject({ kind, shared: true, subject: connectSubject })) {
+        if (
+          !reuseSubject({
+            connected: true,
+            kind,
+            subject: connectSubject,
+          })
+        ) {
           subject = undefined;
           connectSubscription.unsubscribe();
         }
@@ -52,7 +58,13 @@ export function shareWith<T>(
       // connect - the subject should be unsubscribed from the source.
       connectSubscription.add(sourceSubscription);
       connectSubscription.add(() => {
-        if (!reuseSubject({ kind, shared: false, subject: connectSubject })) {
+        if (
+          !reuseSubject({
+            connected: false,
+            kind,
+            subject: connectSubject,
+          })
+        ) {
           subject = undefined;
         }
       });
