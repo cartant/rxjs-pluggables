@@ -4,17 +4,17 @@ const path = require("path");
 const webpack = require("webpack");
 const webpackRxjsExternals = require("webpack-rxjs-externals");
 
-module.exports = env => {
-  let filename = "rxjs-strategies.umd.js";
+module.exports = (env) => {
+  let filename = "rxjs-pluggables.umd.js";
   let mode = "development";
   if (env && env.production) {
-    filename = "rxjs-strategies.min.umd.js";
+    filename = "rxjs-pluggables.min.umd.js";
     mode = "production";
   }
   return {
     context: path.join(__dirname, "./"),
     entry: {
-      index: "./source/index.ts"
+      index: "./source/index.ts",
     },
     externals: webpackRxjsExternals(),
     mode,
@@ -26,22 +26,22 @@ module.exports = env => {
             loader: "ts-loader",
             options: {
               compilerOptions: {
-                declaration: false
+                declaration: false,
               },
-              configFile: "tsconfig-dist-cjs.json"
-            }
-          }
-        }
-      ]
+              configFile: "tsconfig-dist-cjs.json",
+            },
+          },
+        },
+      ],
     },
     output: {
       filename,
-      library: "rxjsStrategies",
+      library: "rxjsPluggables",
       libraryTarget: "umd",
-      path: path.resolve(__dirname, "./bundles")
+      path: path.resolve(__dirname, "./bundles"),
     },
     resolve: {
-      extensions: [".ts", ".js"]
-    }
+      extensions: [".ts", ".js"],
+    },
   };
 };

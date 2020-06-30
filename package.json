@@ -1,10 +1,10 @@
 {
   "author": "Nicholas Jamieson <nicholas@cartant.com>",
   "bugs": {
-    "url": "https://github.com/cartant/rxjs-strategies/issues"
+    "url": "https://github.com/cartant/rxjs-pluggables/issues"
   },
   "dependencies": {},
-  "description": "RxJS observables and operators with flexible strategies",
+  "description": "RxJS observables and operators with pluggable strategies",
   "devDependencies": {
     "@cartant/eslint-config": "^1.0.2",
     "@cartant/eslint-config-etc": "^1.0.2",
@@ -35,7 +35,7 @@
     "webpack-cli": "^3.0.0",
     "webpack-rxjs-externals": "^2.0.0"
   },
-  "homepage": "https://github.com/cartant/rxjs-strategies",
+  "homepage": "https://github.com/cartant/rxjs-pluggables",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
@@ -43,19 +43,18 @@
   },
   "keywords": [
     "observable",
+    "pluggable",
     "rxjs",
     "strategies"
   ],
   "license": "MIT",
   "lint-staged": {
-    "*.{js,ts}": [
-      "eslint",
-      "prettier --write"
-    ]
+    "*.{js,ts}": "prettier --write",
+    "*.ts": "eslint"
   },
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "name": "rxjs-strategies",
+  "name": "rxjs-pluggables",
   "optionalDependencies": {},
   "peerDependencies": {
     "rxjs": "^6.0.0"
@@ -66,7 +65,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cartant/rxjs-strategies.git"
+    "url": "https://github.com/cartant/rxjs-pluggables.git"
   },
   "scripts": {
     "dist": "yarn run lint && yarn run dist:clean && yarn run dist:build && yarn run dist:copy",
@@ -74,8 +73,8 @@
     "dist:build:bundle": "webpack --config webpack.config.js && webpack --config webpack.config.js --env.production",
     "dist:build:cjs": "tsc -p tsconfig-dist-cjs.json",
     "dist:build:esm": "tsc -p tsconfig-dist-esm.json",
-    "dist:clean": "rimraf dist && rimraf bundles/rxjs-strategies.* && mkdirp bundles",
-    "dist:copy": "cpy bundles/rxjs-strategies.* dist/bundles/",
+    "dist:clean": "rimraf dist && rimraf bundles/rxjs-pluggables.* && mkdirp bundles",
+    "dist:copy": "cpy bundles/rxjs-pluggables.* dist/bundles/",
     "lint": "eslint \"./source/**/*.{js,ts}\"",
     "prepublishOnly": "yarn run test && yarn run dist",
     "prettier": "prettier --write \"./source/**/*.{js,json,ts}\"",
@@ -86,6 +85,6 @@
     "test:mocha": "mocha build/**/*-spec.js"
   },
   "types": "./dist/esm/index.d.ts",
-  "unpkg": "./dist/bundles/rxjs-strategies.min.umd.js",
+  "unpkg": "./dist/bundles/rxjs-pluggables.min.umd.js",
   "version": "0.0.1-alpha.1"
 }

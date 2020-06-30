@@ -1,1 +1,1 @@
-# rxjs-strategies
+# rxjs-pluggables
