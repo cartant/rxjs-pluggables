@@ -3,4 +3,4 @@
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-pluggables
  */
 
-export * from "./control";
+export * from "./traverse";

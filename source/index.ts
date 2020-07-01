@@ -3,6 +3,6 @@
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-pluggables
  */
 
-export * from "./control";
 export * from "./share-with";
 export * from "./switch-map-with";
+export * from "./traverse";

@@ -18,40 +18,40 @@ import {
 import { expand, ignoreElements, mergeMap, tap } from "rxjs/operators";
 import { QueuedNotifications } from "./queued-notifications";
 
-export type ControlElement<T, M> = {
+export type TraverseElement<T, M> = {
   markers: ObservableInput<M>;
   values: ObservableInput<T>;
 };
-export type ControlFactory<T, M> = (
+export type TraverseFactory<T, M> = (
   marker: M | undefined,
   index: number
-) => Observable<ControlElement<T, M>>;
+) => Observable<TraverseElement<T, M>>;
 
-export function control<T, M>(options: {
+export function traverse<T, M>(options: {
   concurrency?: number;
-  factory: ControlFactory<T, M>;
+  factory: TraverseFactory<T, M>;
   notifier: Observable<any>;
 }): Observable<T>;
 
-export function control<T, M, R>(options: {
+export function traverse<T, M, R>(options: {
   concurrency?: number;
-  factory: ControlFactory<T, M>;
+  factory: TraverseFactory<T, M>;
   operator: OperatorFunction<T, R>;
 }): Observable<R>;
 
-export function control<T, M>(options: {
+export function traverse<T, M>(options: {
   concurrency?: number;
-  factory: ControlFactory<T, M>;
+  factory: TraverseFactory<T, M>;
 }): Observable<T>;
 
-export function control<T, M, R>({
+export function traverse<T, M, R>({
   concurrency = 1,
   factory,
   operator = identity,
   notifier,
 }: {
   concurrency?: number;
-  factory: ControlFactory<T, M>;
+  factory: TraverseFactory<T, M>;
   operator?: OperatorFunction<T, T | R>;
   notifier?: Observable<any>;
 }): Observable<T | R> {

@@ -16,9 +16,9 @@ import {
 } from "rxjs";
 import { marbles } from "rxjs-marbles";
 import { delay, ignoreElements, map } from "rxjs/operators";
-import { control } from "./control";
+import { traverse } from "./traverse";
 
-describe("control", () => {
+describe("traverse", () => {
   describe("lists", () => {
     const createFactory = (
       max = Infinity,
@@ -48,8 +48,8 @@ describe("control", () => {
         const expected = m.cold(" ----|");
 
         const factory = createFactory(-1, 1, m.time("--|"), m.scheduler);
-        const controlled = control({ factory, notifier });
-        m.expect(controlled).toBeObservable(expected);
+        const traversed = traverse({ factory, notifier });
+        m.expect(traversed).toBeObservable(expected);
         m.expect(notifier).toHaveSubscriptions(notifierSubs);
       })
     );
@@ -61,8 +61,8 @@ describe("control", () => {
         const expected = m.cold(" 0-");
 
         const factory = createFactory();
-        const controlled = control({ factory, notifier });
-        m.expect(controlled).toBeObservable(expected);
+        const traversed = traverse({ factory, notifier });
+        m.expect(traversed).toBeObservable(expected);
       })
     );
 
@@ -73,8 +73,8 @@ describe("control", () => {
         const expected = m.cold(" 0-1----2--3--");
 
         const factory = createFactory();
-        const controlled = control({ factory, notifier });
-        m.expect(controlled).toBeObservable(expected);
+        const traversed = traverse({ factory, notifier });
+        m.expect(traversed).toBeObservable(expected);
       })
     );
 
@@ -85,8 +85,8 @@ describe("control", () => {
         const expected = m.cold(" (01)-(12)----(23)--(34)--");
 
         const factory = createFactory(Infinity, 2);
-        const controlled = control({ factory, notifier });
-        m.expect(controlled).toBeObservable(expected);
+        const traversed = traverse({ factory, notifier });
+        m.expect(traversed).toBeObservable(expected);
       })
     );
 
@@ -102,8 +102,8 @@ describe("control", () => {
           m.time("----|"),
           m.scheduler
         );
-        const controlled = control({ factory, notifier });
-        m.expect(controlled).toBeObservable(expected);
+        const traversed = traverse({ factory, notifier });
+        m.expect(traversed).toBeObservable(expected);
       })
     );
 
@@ -112,8 +112,8 @@ describe("control", () => {
       marbles((m) => {
         const expected = m.cold("----0---1---2---|");
         const factory = createFactory(2, 1, m.time("----|"), m.scheduler);
-        const controlled = control({ factory });
-        m.expect(controlled).toBeObservable(expected);
+        const traversed = traverse({ factory });
+        m.expect(traversed).toBeObservable(expected);
       })
     );
 
@@ -129,11 +129,11 @@ describe("control", () => {
         const expected = m.cold(" ----0---1---2---|");
 
         const factory = createFactory(2, 1, m.time("----|"), m.scheduler);
-        const controlled = control({
+        const traversed = traverse({
           factory,
           operator: (source) => concat(source, other),
         });
-        m.expect(controlled).toBeObservable(expected);
+        m.expect(traversed).toBeObservable(expected);
         m.expect(other).toHaveSubscriptions(subs);
       })
     );
@@ -150,11 +150,11 @@ describe("control", () => {
         const expected = m.cold(" 0---1---2---|");
 
         const factory = createFactory(2);
-        const controlled = control({
+        const traversed = traverse({
           factory,
           operator: (source) => concat(source, other),
         });
-        m.expect(controlled).toBeObservable(expected);
+        m.expect(traversed).toBeObservable(expected);
         m.expect(other).toHaveSubscriptions(subs);
       })
     );
@@ -195,8 +195,8 @@ describe("control", () => {
           }
         };
 
-        const controlled = control({ factory });
-        m.expect(controlled).toBeObservable(expected);
+        const traversed = traverse({ factory });
+        m.expect(traversed).toBeObservable(expected);
         m.expect(w).toHaveSubscriptions(wSubs);
         m.expect(x).toHaveSubscriptions(xSubs);
         m.expect(y).toHaveSubscriptions(ySubs);
@@ -242,8 +242,8 @@ describe("control", () => {
         const expected = m.cold(" (abc)-(de)--(f|)");
 
         const factory = createFactory();
-        const controlled = control({ factory, notifier });
-        m.expect(controlled).toBeObservable(expected);
+        const traversed = traverse({ factory, notifier });
+        m.expect(traversed).toBeObservable(expected);
       })
     );
 
@@ -254,8 +254,8 @@ describe("control", () => {
         const expected = m.cold(" ------(abc)-(de)--(f|)");
 
         const factory = createFactory(m.time("------|"), m.scheduler);
-        const controlled = control({ factory, notifier });
-        m.expect(controlled).toBeObservable(expected);
+        const traversed = traverse({ factory, notifier });
+        m.expect(traversed).toBeObservable(expected);
       })
     );
 
@@ -264,8 +264,8 @@ describe("control", () => {
       marbles((m) => {
         const expected = m.cold("------(abc)-(de)--(f|)");
         const factory = createFactory(m.time("------|"), m.scheduler);
-        const controlled = control({ factory });
-        m.expect(controlled).toBeObservable(expected);
+        const traversed = traverse({ factory });
+        m.expect(traversed).toBeObservable(expected);
       })
     );
 
@@ -274,8 +274,8 @@ describe("control", () => {
       marbles((m) => {
         const expected = m.cold("------(abc)-(def|)");
         const factory = createFactory(m.time("------|"), m.scheduler);
-        const controlled = control({ concurrency: Infinity, factory });
-        m.expect(controlled).toBeObservable(expected);
+        const traversed = traverse({ concurrency: Infinity, factory });
+        m.expect(traversed).toBeObservable(expected);
       })
     );
   });
@@ -323,7 +323,7 @@ describe("control", () => {
     describe("with notifier", () => {
       it("should traverse the pages", (callback: any) => {
         const notifier = new Subject<any>();
-        const urls = control({
+        const urls = traverse({
           factory: (marker?: string) =>
             get(marker || "https://api.github.com/users/cartant/repos").pipe(
               map((response) => ({
@@ -355,7 +355,7 @@ describe("control", () => {
 
     describe("with an operator", () => {
       it("should traverse the pages", (callback: any) => {
-        const urls = control({
+        const urls = traverse({
           factory: (marker?: string) =>
             get(marker || "https://api.github.com/users/cartant/repos").pipe(
               map((response) => ({
