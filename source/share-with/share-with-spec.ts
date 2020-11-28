@@ -2,6 +2,7 @@
  * @license Use of this source code is governed by an MIT-style license that
  * can be found in the LICENSE file at https://github.com/cartant/rxjs-pluggables
  */
+/* eslint no-unused-expressions: "off" */
 
 import { expect } from "chai";
 import { ReplaySubject, Subject } from "rxjs";

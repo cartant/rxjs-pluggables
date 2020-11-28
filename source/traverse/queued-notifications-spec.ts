@@ -25,7 +25,7 @@ describe("QueuedNotifications", () => {
           const subject = new AsyncSubject<string>();
           notifications.queue.subscribe(
             (index) => subject.error(new Error("Unexpected index.")),
-            (error) => subject.error(error),
+            (error: unknown) => subject.error(error),
             () => subject.error(new Error("Unexpected completion."))
           );
           return subject;
@@ -51,7 +51,7 @@ describe("QueuedNotifications", () => {
           const subject = new AsyncSubject<string>();
           notifications.queue.subscribe(
             (index) => subject.next(index.toString()),
-            (error) => subject.error(error),
+            (error: unknown) => subject.error(error),
             () => subject.complete()
           );
           return subject;
@@ -77,7 +77,7 @@ describe("QueuedNotifications", () => {
           const subject = new AsyncSubject<string>();
           notifications.queue.subscribe(
             (index) => subject.next(index.toString()),
-            (error) => subject.error(error),
+            (error: unknown) => subject.error(error),
             () => subject.complete()
           );
           return subject;
@@ -103,7 +103,7 @@ describe("QueuedNotifications", () => {
           const subject = new AsyncSubject<string>();
           notifications.queue.subscribe(
             (index) => subject.next(index.toString()),
-            (error) => subject.error(error),
+            (error: unknown) => subject.error(error),
             () => subject.complete()
           );
           return subject;

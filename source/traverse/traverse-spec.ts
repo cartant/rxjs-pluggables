@@ -221,12 +221,12 @@ describe("traverse", () => {
       };
       const node = marker ? marker : data;
       const element: any = { markers: [], values: [] };
-      Object.keys(node).forEach((key) => {
+      for (const key of Object.keys(node)) {
         if (Object.keys(node[key]).length) {
           element.markers.push(node[key]);
         }
         element.values.push(key);
-      });
+      }
       return time && scheduler
         ? concat(
             timer(time, scheduler).pipe(ignoreElements()) as Observable<never>,
@@ -325,7 +325,7 @@ describe("traverse", () => {
         const notifier = new Subject<any>();
         const urls = traverse({
           factory: (marker?: string) =>
-            get(marker || "https://api.github.com/users/cartant/repos").pipe(
+            get(marker ?? "https://api.github.com/users/cartant/repos").pipe(
               map((response) => ({
                 markers: response.next ? [response.next] : [],
                 values: response.content,
@@ -357,7 +357,7 @@ describe("traverse", () => {
       it("should traverse the pages", (callback: any) => {
         const urls = traverse({
           factory: (marker?: string) =>
-            get(marker || "https://api.github.com/users/cartant/repos").pipe(
+            get(marker ?? "https://api.github.com/users/cartant/repos").pipe(
               map((response) => ({
                 markers: response.next ? [response.next] : [],
                 values: response.content,

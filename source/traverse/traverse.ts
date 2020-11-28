@@ -103,7 +103,7 @@ export function traverse<T, M, R>({
           complete() {
             destination.complete();
           },
-          error(error) {
+          error(error: unknown) {
             destination.error(error);
           },
         })

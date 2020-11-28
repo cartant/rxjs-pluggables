@@ -70,7 +70,7 @@ export function shareWith<T>(
       });
       return connectSubscription;
     }
-    return defer(() => subject || (subject = factory())).pipe(
+    return defer(() => subject ?? (subject = factory())).pipe(
       operator(connect)
     );
   };
